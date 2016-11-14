@@ -1,0 +1,1 @@
+sbt "run-main eu.svez.backpressuredemo.LocalDemo"
