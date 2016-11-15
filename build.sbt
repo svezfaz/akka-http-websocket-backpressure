@@ -8,7 +8,10 @@ val akkaV = "2.4.11"
 val kamonV = "0.6.3"
 
 val akkaDeps = Seq(
-  "com.typesafe.akka" %% "akka-http-experimental" % akkaV
+  "com.typesafe.akka" %% "akka-http-experimental" % akkaV,
+  "javax.websocket" % "javax.websocket-api" % "1.0",
+  "org.glassfish.tyrus" % "tyrus-client" % "1.1" % Runtime,
+  "org.glassfish.tyrus" % "tyrus-container-grizzly" % "1.1" % Runtime
 )
 
 val kamonDeps = Seq(

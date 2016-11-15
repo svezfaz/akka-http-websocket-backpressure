@@ -2,7 +2,7 @@ package eu.svez.backpressuredemo
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.ws.TextMessage
+import akka.http.scaladsl.model.ws.Message
 import akka.http.scaladsl.server.Directives._
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
@@ -19,12 +19,12 @@ object RemoteDemoServer extends App{
 
   Kamon.start()
 
-  val source = Source.repeat("hello")
-    .throttle(1, 1.milli, 1, ThrottleMode.Shaping)
-    .via(checkpoint("source"))
-    .map(TextMessage(_))
+  val sink = Flow[Message]
+    .throttle(1, 1.second, 1, ThrottleMode.Shaping)
+    .via(checkpoint("sink"))
+    .to(Sink.ignore)
 
-  val handlerFlow = Flow.fromSinkAndSource(Sink.ignore, source)
+  val handlerFlow = Flow.fromSinkAndSource(sink, Source.maybe)
 
   val route = get {
     path("prices") {
@@ -37,7 +37,7 @@ object RemoteDemoServer extends App{
   val host = "0.0.0.0"
   val port = 8080
 
-  Http().bindAndHandle(route, host, port).map { _ =>
+  Http().bindAndHandle(route, host, port).foreach { _ =>
     println(s"Websocket server started on $host:$port")
   }
 
